@@ -24,16 +24,11 @@ instance Show Json where
     show (JsonString s) = show s
     show (JsonDouble d) = show d
     show (JsonInteger i) = show i
-    show (JsonBool b) = case b of
-                          True -> "true"
-                          False -> "false"
+    show (JsonBool True) = "true"
+    show (JsonBool False) = "false"
     show JsonNull = "null"
-    show (JsonArray arr) = "[" ++ 
-                           intercalate ", "  (map show arr) 
-                           ++ "]"
-    show (JsonObject assocList) = "{" ++ 
-                                  intercalate ", " (map (\(a, b) -> (show a) ++ ": " ++ (show b)) assocList)
-                                  ++ "}"
+    show (JsonArray arr) = "[" ++ intercalate ", "  (map show arr) ++ "]"
+    show (JsonObject assocList) = "{" ++ intercalate ", " (map (\(a, b) -> (show a) ++ ": " ++ (show b)) assocList) ++ "}"
 
           
 lexer = Token.makeTokenParser emptyDef 
