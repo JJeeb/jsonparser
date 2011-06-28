@@ -1,6 +1,3 @@
-{-# LANGUAGE DeriveDataTypeable #-}
-
-
 module JsonParser where
 
 import Control.Monad (liftM)
@@ -17,8 +14,7 @@ data Json = JsonString String
   | JsonNull
   | JsonArray [Json]
   | JsonObject [(String, Json)]
-  deriving (Eq, Typeable, Data)
-
+  deriving (Eq)
 
 instance Show Json where
     show (JsonString s) = show s
@@ -29,7 +25,6 @@ instance Show Json where
     show JsonNull = "null"
     show (JsonArray arr) = "[" ++ intercalate ", "  (map show arr) ++ "]"
     show (JsonObject assocList) = "{" ++ intercalate ", " (map (\(a, b) -> (show a) ++ ": " ++ (show b)) assocList) ++ "}"
-
           
 lexer = Token.makeTokenParser emptyDef 
 
@@ -40,7 +35,6 @@ integer         = Token.integer       lexer
 squares         = Token.squares       lexer
 braces          = Token.braces        lexer
 commaSep        = Token.commaSep      lexer
-
 
 json :: Parser Json
 json = choice [ stringLiteral              >>= (return . JsonString), 
@@ -58,7 +52,6 @@ json = choice [ stringLiteral              >>= (return . JsonString),
                       symbol ":"
                       val <- json
                       return (key, val)
-
 
 jsonFile :: Parser Json
 jsonFile = do value <- json
