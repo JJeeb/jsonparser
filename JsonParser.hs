@@ -36,9 +36,7 @@ instance Show Json where
                                   ++ "}"
 
           
-lexer = Token.makeTokenParser emptyDef {commentStart = "/*",
-                                        commentEnd = "*/",
-                                        commentLine = "//"}
+lexer = Token.makeTokenParser emptyDef 
 
 symbol          = Token.symbol        lexer
 stringLiteral   = Token.stringLiteral lexer
@@ -48,20 +46,18 @@ squares         = Token.squares       lexer
 braces          = Token.braces        lexer
 commaSep        = Token.commaSep      lexer
 
-($>) :: (Monad m) => m a1 -> (a1 -> r) -> m r
-a $> b = liftM b a
 
 json :: Parser Json
-json = choice [ stringLiteral              $> JsonString, 
-                try float                  $> JsonDouble,
-                integer                    $> JsonInteger,
-                (true <|> false)           $> JsonBool,
-                symbol "null"              $> const JsonNull,
-                (squares . commaSep) json  $> JsonArray,
-                (braces . commaSep)  assoc $> JsonObject ]
+json = choice [ stringLiteral              >>= (return . JsonString), 
+                try float                  >>= (return . JsonDouble),
+                integer                    >>= (return . JsonInteger),
+                (true <|> false)           >>= (return . JsonBool),
+                symbol "null"              >>= (return . const JsonNull),
+                (squares . commaSep) json  >>= (return . JsonArray),
+                (braces . commaSep)  assoc >>= (return . JsonObject) ]
          where
-           true  = symbol "true"  $> const True 
-           false = symbol "false" $> const False
+           true  = symbol "true"  >>= (return . const True)
+           false = symbol "false" >>= (return . const False)
 
            assoc = do key <- stringLiteral
                       symbol ":"
